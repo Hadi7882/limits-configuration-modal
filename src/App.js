@@ -12,578 +12,123 @@ import {
   FormLabel,
   Box,
   Button,
+  Switch,
+  Modal,
+  ToggleButton,
 } from "@mui/material";
-import Switch from "@mui/material/Switch";
 import React, { useState } from "react";
 
 function App() {
-  const [switchState, setSwitchState] = useState(true);
-  const [switchState1, setSwitchState1] = useState(false);
-  const [switchState2, setSwitchState2] = useState(false);
-  const [switchState3, setSwitchState3] = useState(true);
-  const [switchState4, setSwitchState4] = useState(false);
-  const [switchState5, setSwitchState5] = useState(false);
-
   const [selectedSensor, setSelectedSensor] = useState("Vibration Sensor");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [activeSwitch, setActiveSwitch] = useState("green");
+  const [open, setOpen] = useState(false);
 
   const handleSensorTypeChange = (event) => {
     setSelectedSensor(event.target.value);
+    setActiveSwitch("green"); // Reset to green alert level on sensor switch
   };
-  const [selectedOption, setSelectedOption] = useState("");
 
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
   };
 
   return (
-    <Grid2
-      sx={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: 400,
-        bgcolor: "background.paper",
-        boxShadow: 24,
-        p: 4,
-        borderRadius: 2,
-      }}
-    >
-      <FormControl sx={{ minWidth: 400 }}>
-        <FormLabel
-          id="demo-row-radio-buttons-group-label"
+    <>
+      <ToggleButton variant="contained" onClick={() => setOpen(true)}> Open Modal</ToggleButton>
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <Grid2
           sx={{
-            textTransform: "uppercase",
-            color: "DarkBlue",
-            fontWeight: "bold",
-            fontSize: "large",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
           }}
         >
-          Config For Site
-        </FormLabel>
-        <RadioGroup
-          row
-          aria-labelledby="demo-row-radio-buttons-group-label"
-          defaultValue="Vibration Sensor"
-          name="row-radio-buttons-group"
-          onChange={handleSensorTypeChange}
-          // align="center"
-        >
-          <FormControlLabel
-            value="Vibration Sensor"
-            control={<Radio />}
-            label="Vibration Sensor"
-          />
-          <FormControlLabel
-            value="Wind Sensor"
-            control={<Radio />}
-            label="Wind Sensor"
-          />
-        </RadioGroup>
+          <FormControl sx={{ minWidth: 400 }}>
+            <FormLabel sx={{ textTransform: "uppercase", color: "DarkBlue", fontWeight: "bold", fontSize: "large" }}>
+              Config For Site
+            </FormLabel>
+            <RadioGroup row value={selectedSensor} onChange={handleSensorTypeChange}>
+              <FormControlLabel value="Vibration Sensor" control={<Radio />} label="Vibration Sensor" />
+              <FormControlLabel value="Wind Sensor" control={<Radio />} label="Wind Sensor" />
+            </RadioGroup>
 
-        {selectedSensor === "Vibration Sensor" && (
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "20px",
-                padding: "10px",
-              }}
-            >
-              <FormControl
-                sx={{
-                  width: "80%",
-                }}
-              >
-                <InputLabel>Vibration sensor</InputLabel>
-                <Select
-                  value={selectedOption}
-                  onChange={handleOptionChange}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Vibration Speed"
-                >
-                  <MenuItem value={10}>Vibration speed</MenuItem>
-                  <MenuItem value={20}>Vibration Displacement</MenuItem>
-                  <MenuItem value={30}>Vibration Frequency</MenuItem>
-                  <MenuItem value={30}>Vibration Amplitude</MenuItem>
+            {/* Common Select Field */}
+            <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "20px", padding: "10px" }}>
+              <FormControl sx={{ width: "80%" }}>
+                <InputLabel>{selectedSensor} </InputLabel>
+                <Select value={selectedOption} onChange={handleOptionChange}>
+                  {selectedSensor === "Vibration Sensor" ? (
+                    <>
+                      <MenuItem value={"speed"} >Vibration Speed</MenuItem>
+                      <MenuItem value={"displacement"}>Vibration Displacement</MenuItem>
+                      <MenuItem value={"frequency"}>Vibration Frequency</MenuItem>
+                      <MenuItem value={"amplitude"}>Vibration Amplitude</MenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <MenuItem value={"wind_speed"}>Wind Speed</MenuItem>
+                      <MenuItem value={"temperature"}>Temperature</MenuItem>
+                      <MenuItem value={"humidity"}>Humidity</MenuItem>
+                      <MenuItem value={"wind_direction"}>Wind Direction</MenuItem>
+                    </>
+                  )}
                 </Select>
               </FormControl>
             </Box>
 
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                // gap: "100px",
-                padding: "5px",
-              }}
-            >
-              <Switch
-                defaultChecked
-                value="checkedA"
-                inputProps={{ "aria-label": "Switch A" }}
-                onChange={() => setSwitchState(!switchState)}
-              />
-              <FormLabel
-                id="demo-row-radio-buttons-group-label"
-                row
-                sx={{
-                  fontWeight: "bold",
-                }}
-              >
-                Green alert level
-              </FormLabel>
-            </Box>
-            {switchState && (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    // alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min X"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
+            {/* Alert Levels */}
+            {selectedSensor === "Vibration Sensor" ? (
+              ["green", "yellow", "red"].map( (level) => (
+                <Box key={level} sx={{ display: "flex", flexDirection: "column", padding: "5px" }}>
+                  <FormControlLabel
+                    control={<Switch checked={activeSwitch === level} onChange={() => setActiveSwitch(level)} />}
+                    label={`${level.charAt(0).toUpperCase() + level.slice(1)} Alert Level`}
                   />
-                  <TextField
-                    label="max X"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
+                  {activeSwitch === level && (
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px" }}>
+                      {["X", "Y", "Z"].map((axis) => (
+                        <Box key={axis} sx={{ display: "flex", gap: "10px" }}>
+                          <TextField label={`Min ${axis}`} variant="outlined" type="number" sx={{ width: 150 }} />
+                          <TextField label={`Max ${axis}`} variant="outlined" type="number" sx={{ width: 150 }} />
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
                 </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    // alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min Y"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
+              ))
+            ) : (
+              ["green", "yellow", "red"].map((level) => (
+                <Box key={level} sx={{ display: "flex", flexDirection: "column", padding: "5px" }}>
+                  <FormControlLabel
+                    control={<Switch checked={activeSwitch === level} onChange={() => setActiveSwitch(level)} />}
+                    label={`${level.charAt(0).toUpperCase() + level.slice(1)} Alert Level`}
                   />
-                  <TextField
-                    label="max Y"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
+                  {activeSwitch === level && (
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px" }}>
+                      <TextField label={`${level.charAt(0).toUpperCase() + level.slice(1)} Min`} variant="outlined" type="number" sx={{ width: 150 }} />
+                      <TextField label={`${level.charAt(0).toUpperCase() + level.slice(1)} Max`} variant="outlined" type="number" sx={{ width: 150 }} />
+                    </Box>
+                  )}
                 </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    // alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min Z"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                  <TextField
-                    label="max Z"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                </Box>
-              </>
+              ))
             )}
+          </FormControl>
 
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                // gap: "100px",
-                padding: "5px",
-              }}
-            >
-              <Switch
-                value="checkedA"
-                inputProps={{ "aria-label": "Switch A" }}
-                onChange={() => setSwitchState1(!switchState1)}
-              />
-              <FormLabel
-                id="demo-row-radio-buttons-group-label"
-                sx={{
-                  fontWeight: "bold",
-                }}
-              >
-                Yellow alert level
-              </FormLabel>
-            </Box>
-
-            {switchState1 && (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    // alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min X"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                  <TextField
-                    label="max X"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min Y"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                  <TextField
-                    label="max Y"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min Z"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                  <TextField
-                    label="max Z"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                </Box>
-              </>
-            )}
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                padding: "5px",
-              }}
-            >
-              <Switch
-                value="checkedA"
-                inputProps={{ "aria-label": "Switch A" }}
-                onChange={() => setSwitchState2(!switchState2)}
-              />
-              <FormLabel
-                id="demo-row-radio-buttons-group-label"
-                sx={{
-                  fontWeight: "bold",
-                }}
-              >
-                Red alert level
-              </FormLabel>
-            </Box>
-
-            {switchState2 && (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min X"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                  <TextField
-                    label="max X"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min Y"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                  <TextField
-                    label="max Y"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "50px",
-                    padding: "10px",
-                  }}
-                >
-                  <TextField
-                    label="min Z"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                  <TextField
-                    label="max Z"
-                    variant="outlined"
-                    type="number "
-                    sx={{ width: 100 }}
-                  />
-                </Box>
-              </>
-            )}
-          </>
-        )}
-
-        {selectedSensor === "Wind Sensor" && (
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "50px",
-              }}
-            >
-              <FormControl
-                sx={{
-                  width: "80%",
-                }}
-              >
-                <InputLabel>Wind Speed</InputLabel>
-                <Select
-                  value={selectedOption}
-                  onChange={handleOptionChange}
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Vibration Speed"
-                >
-                  <MenuItem value={10}>Wind speed</MenuItem>
-                  <MenuItem value={20}>Tempreature</MenuItem>
-                  <MenuItem value={30}>Humidity</MenuItem>
-                  <MenuItem value={40}>Wind Direction</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                // gap: "100px"
-                padding: "5px",
-              }}
-            >
-              <Switch
-                defaultChecked
-                value="checkedA"
-                inputProps={{ "aria-label": "Switch A" }}
-                onChange={() => setSwitchState3(!switchState3)}
-              />
-              <FormLabel>Green Alert level</FormLabel>
-            </Box>
-
-            {switchState3 && (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    // alignItems: "center",
-                    gap: "20px",
-                  }}
-                >
-                  <TextField
-                    label="Green min"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 120 }}
-                  />
-                  <TextField
-                    label="Green max"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 120, gap: "10px" }}
-                  />
-                </Box>{" "}
-              </>
-            )}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                // gap: "100px"
-                padding: "5px",
-              }}
-            >
-              <Switch
-                value="checkedA"
-                inputProps={{ "aria-label": "Switch A" }}
-                onChange={() => setSwitchState4(!switchState4)}
-              />
-              <FormLabel>Yellow Alert level</FormLabel>
-            </Box>
-
-            {switchState4 && (
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    // alignItems: "center",
-                    gap: "20px",
-                  }}
-                >
-                  <TextField
-                    label="Yellow min"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                  <TextField
-                    label="Yellow max"
-                    variant="outlined"
-                    type="number"
-                    sx={{ width: 100 }}
-                  />
-                </Box>
-              </>
-            )}
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                // gap: "120px"
-              }}
-            >
-              <Switch
-                value="checkedA"
-                inputProps={{ "aria-label": "Switch A" }}
-                onChange={() => setSwitchState5(!switchState5)}
-              />
-              <FormLabel>Red Alert level</FormLabel>
-            </Box>
-
-            {switchState5 && (
-              <>
-                <Grid2
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    // alignItems: "center",
-                    gap: "20px",
-                  }}
-                >
-                  <TextField
-                    label=" Red min"
-                    variant="outlined"
-                    inputProps={{
-                      inputMode: "numeric", // for mobile devices
-                      pattern: "[0-9]*", // regex pattern to allow only digits
-                    }}
-                    padding="10px"
-                    sx={{
-                      width: 100,
-                    }}
-                  />
-                  <TextField
-                    label="Red max"
-                    variant="outlined"
-                    inputProps={{
-                      inputMode: "numeric", // for mobile devices
-                      pattern: "[0-9]*", // regex pattern to allow only digits
-                    }}
-                    sx={{ width: 100 }}
-                  />
-                </Grid2>
-              </>
-            )}
-          </>
-        )}
-      </FormControl>
-
-      <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
-        <Button variant="outlined">Cancel</Button>
-        <Button variant="contained" color="primary">
-          Save
-        </Button>
-      </Box>
-    </Grid2>
+          <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
+            <Button variant="outlined" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button variant="contained" color="primary">Save</Button>
+          </Box>
+        </Grid2>
+      </Modal>
+    </>
   );
 }
+
 export default App;
